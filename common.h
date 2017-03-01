@@ -22,56 +22,57 @@
  * SOFTWARE.
  */
 
-#ifndef RDA5807M_DATA_H
-#define RDA5807M_DATA_H
+#ifndef COMMON_H
+#define COMMON_H
 
-//Data types
-#define RDA5807M_BOOL				unsigned char
-#define RDA5807M_TRUE				(0xff)
-#define RDA5807M_FALSE				(0x00)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define RDA5807M_OK					(0)
-#define RDA5807M_ERR_FAILED			(-1)
+#include <i2c/i2c.h>
 
-enum {
-	RDA5807M_CLK_FREQ_32_768KHZ=0,
-	RDA5807M_CLK_FREQ_12MHZ,
-	RDA5807M_CLK_FREQ_13MHZ,
-	RDA5807M_CLK_FREQ_19_2MHZ,
-	RDA5807M_CLK_FREQ_UNUSED,
-	RDA5807M_CLK_FREQ_24MHZ,
-	RDA5807M_CLK_FREQ_26MHZ,
-	RDA5807M_CLK_FREQ_38_4MHZ
-};
+#include <FreeRTOS.h>
+#include <task.h>
 
-enum {
-	RDA5807M_BAND_87_108_MHZ=0,
-	RDA5807M_BAND_76_91_MHZ,
-	RDA5807M_BAND_76_108_MHZ,
-	RDA5807M_BAND_65_76MHZ
-};
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <assert.h>
 
-enum {
-	RDA5807M_SPACE_100_KHZ=0,
-	RDA5807M_SPACE_200_KHZ,
-	RDA5807M_SPACE_50_KHZ,
-	RDA5807M_SPACE_25_KHZ
-};
+#define SWAP(a, b) { a^=b^=a^=b; }
+#define MSEC2TICKS(n) (n/portTICK_PERIOD_MS)
 
-typedef struct {
-	struct {
-		RDA5807M_BOOL isClkNoCalb;
-		RDA5807M_BOOL isClkDirInp;
-		unsigned char freq;
-	} clkSetting;
-	RDA5807M_BOOL useRDS;
-	RDA5807M_BOOL useNewDMMethod;
-	RDA5807M_BOOL isDECNST50us;
-	struct {
-		unsigned char band;
-		RDA5807M_BOOL is6575Sys;
-		unsigned char space;
-	} system;
-} RDA5807M_SETTING;
+#ifndef RDA5807M_NDEBUG
+static inline int RDA5807M___dbg__(const char *loc, const char *fmt, ...) {
+	va_list args;
+	char _fmt[256]="";
+	int res;
+	
+	va_start(args, fmt);
+	sprintf(_fmt, "[%s] %s", loc, fmt);
+	res=vprintf(_fmt, args);
+	va_end(args);
+	
+	return res;
+}
+
+#define DBG(...) RDA5807M___dbg__(__func__, __VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
+int RDA5807M_readReg(unsigned char regAddr, unsigned short *pData);
+int RDA5807M_writeReg(unsigned char regAddr, unsigned short data);
+#define readReg(a, b) RDA5807M_readReg(a, b)
+#define writeReg(a, b) RDA5807M_writeReg(a, b)
+
+/*
+static int readRegs(unsigned short *pData, unsigned int count);
+static int writeRegs(unsigned short *pData, unsigned int count);
+*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
