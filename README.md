@@ -3,18 +3,21 @@ RDA5807M driver for ESP8266 (esp-open-rtos)
 
 
 ## Description
-RDA5807M is a low cost FM receiver with I2C interface. Users can use it to build a small FM radio receiver. Due to the small size of the chip, the module RRD-102 is more popular among creators. RRD-102 integrates RDA5807M, some surrounding parts and big pads for easily soldering. The software provides interfaces to access registers in RDA5807M and gives meaningful result to user.
+RDA5807M is a low cost FM receiver with I2C interface. Users can use it to build a small FM radio receiver. Due to the small size of the chip, the module RRD-102 is more popular among creators. RRD-102 integrates RDA5807M, surrounding parts and pads for easily soldering. This software provides interfaces to access registers in RDA5807M / RRD-102 and gives meaningful result to user.
 
 
-## How to use the software
+## How to use this software
 First at all, build your own RDA5807M circuit. If you don't know how, the reference design of [datasheet](http://wiki.seeedstudio.com/wiki/File:RDA5807M_datasheet_v1.1.pdf) would be helpful for you.
 
 
-Make sure you are using esp-open-rtos. The current version of this software is for esp-open-rtos only. Put this software in the extra folder of esp-open-rtos and add "extras/rda5807m" and "extras/i2c" to "EXTRA_COMPONENTS" variable of the makefile of your project. You may want to disable debug output by setting 'RDA5807M_NDEBUG' variable.
+Make sure you are using esp-open-rtos. The current version of this software is for esp-open-rtos only. Put this software in the extra folder of esp-open-rtos and add "extras/rda5807m" and "extras/i2c" to "EXTRA_COMPONENTS" variable of the makefile of your project. You may want to disable debug outputs by setting 'RDA5807M_NDEBUG' variable if they are annoying.
+
+## Task-safe
+All APIs of this software are NOT task-safe. You should do synchronization in callers of these APIs.
 
 
 ## Initialization
-At the start of your project, you should to initialize RDA5807M. Here is an example:
+You should initialize RDA5807M before any API call. Here is an example:
 
 	RDA5807M_SETTING rxSetting={
 		.clkSetting={
@@ -41,7 +44,7 @@ At the start of your project, you should to initialize RDA5807M. Here is an exam
 	RDA5807M_unmute(RDA5807M_TRUE);
 
 Above statements configure RDA5807M as:
-* No clock calibrating.
+* Don't do clock calibrating.
 * Clock source is crystal oscillator.
 * Crystal oscillator is rated at 32.768KHz.
 * Receive and parse RDS data.
@@ -52,10 +55,9 @@ Above statements configure RDA5807M as:
 * Use 100KHz channel space.
 * Initial frequency is 96MHz.
 * Enable audio power amplifier.
-* Set Volume to level 1.
-* Unmute the chip.
-
-After initializing RDA5807M, you can invoke rest APIs in this software.
+* Initial volume level is 1.
+* Unmute.
 
 ## Debugging
 You can invoke RDA5807M_dump() to print register values in your project.
+
