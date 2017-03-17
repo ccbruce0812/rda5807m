@@ -249,6 +249,8 @@ int RDA5807M_setFreq(unsigned long freq) {
 	
 	now=prev=xTaskGetTickCount();
 	while(1) {
+		vTaskDelay(MSEC2TICKS(20));
+		
 		if(readReg(RDA5807M_REG_ADDR_0A, &r0A.b)<0) {
 			DBG("[%d] Failed to invoke readReg().\n", __LINE__);
 			goto failed;
@@ -258,11 +260,10 @@ int RDA5807M_setFreq(unsigned long freq) {
 			break;
 		
 		now=xTaskGetTickCount();
-		if(now-prev>=MSEC2TICKS(1500)) {
+		if(now-prev>=MSEC2TICKS(3000)) {
 			DBG("[%d] Failed to set frequency.\n", __LINE__);
 			goto failed;
 		}
-		vTaskDelay(MSEC2TICKS(500));
 	}
 
 	return RDA5807M_OK;
